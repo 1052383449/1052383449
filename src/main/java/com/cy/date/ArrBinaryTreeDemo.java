@@ -122,19 +122,28 @@ public class ArrBinaryTreeDemo {
         //AVL树（平衡二叉树）插入数据
         System.out.println("AVL树（平衡二叉树）插入数据");
         TreeNode root = null;
-       root = binaryTree.insertAVL(root,7);
-       root = binaryTree.insertAVL(root,8);
-       root = binaryTree.insertAVL(root,3);
-       root = binaryTree.insertAVL(root,1);
-       root = binaryTree.insertAVL(root,4);
-       root = binaryTree.insertAVL(root,5);
-       root = binaryTree.insertAVL(root,2);
-       root = binaryTree.insertAVL(root,1);
+        root = binaryTree.insertAVL(root,7);
+        root = binaryTree.insertAVL(root,8);
+        root = binaryTree.insertAVL(root,3);
+        root = binaryTree.insertAVL(root,1);
+        root = binaryTree.insertAVL(root,4);
+        root = binaryTree.insertAVL(root,5);
+        root = binaryTree.insertAVL(root,2);
+        root = binaryTree.insertAVL(root,1);
        /*root = binaryTree.insertAVL(root,9);*/
 
         System.out.println("____________");
 
+        //层序遍历
+        System.out.println("层序遍历");
+        binaryTree.levelOrder(root);
+        System.out.println("____________");
 
+
+        //AVL树（平衡二叉树）删除数据
+        System.out.println("AVL树（平衡二叉树）删除数据");
+        root = binaryTree.removeAVL(root,7);
+        System.out.println("____________");
 
         //层序遍历
         System.out.println("层序遍历");
@@ -176,6 +185,37 @@ public class ArrBinaryTreeDemo {
 
         }
 
+
+        //调整不平衡节点
+        root = adjustment(root);
+
+        return root;
+    }
+
+    //查找不平衡子树
+    public void searchImbalance(TreeNode root,TreeNode parent, Stack<Map<String,TreeNode>> treeStack){
+        if(root==null) return;
+        //查询左子树的高度
+        int lh = 0;
+        if(root.left!=null){
+            lh = getHeight(root.left);
+        }
+        //查询右子树的高度
+        int rh = 0;
+        if(root.right!=null){
+            rh = getHeight(root.right);
+        }
+        if(lh-rh>1||lh-rh<-1){
+            Map<String,TreeNode> map = new HashMap<String, TreeNode>();
+            map.put("cur",root);
+            map.put("parent",parent);
+            treeStack.push(map);
+        }
+        searchImbalance(root.left,root,treeStack);
+        searchImbalance(root.right,root,treeStack);
+    }
+
+    public TreeNode adjustment(TreeNode root){
         //查找最小不平衡子树
         Stack<Map<String,TreeNode>> treeStack = new Stack<Map<String, TreeNode>>();
         while (treeStack!=null){
@@ -185,7 +225,7 @@ public class ArrBinaryTreeDemo {
                 Map<String,TreeNode> map = treeStack.pop();
                 TreeNode cur = map.get("cur");
                 //LL单旋
-                if(cur.left!=null&&cur.left.left!=null&&(cur.right==null||cur.left.left.left!=null)){
+                if(cur.left!=null&&cur.left.left!=null&&(cur.right==null||cur.left.left.left!=null||cur.left.left.right!=null)){
                     TreeNode newNode = cur.left;
                     cur.left = null;
                     newNode.right = cur;
@@ -262,32 +302,70 @@ public class ArrBinaryTreeDemo {
             }
 
         }
-
-
         return root;
-    }
+    };
 
-    //查找不平衡子树
-    public void searchImbalance(TreeNode root,TreeNode parent, Stack<Map<String,TreeNode>> treeStack){
-        if(root==null) return;
-        //查询左子树的高度
-        int lh = 0;
-        if(root.left!=null){
-            lh = getHeight(root.left);
+    /**
+     * 删除数据
+     * @param root
+     * @param val
+     */
+    public TreeNode removeAVL(TreeNode root,int val){
+        if(root==null) return root;
+
+        //找到当前节点
+        TreeNode cur = root;
+        TreeNode parent=null;
+        while(cur!=null){
+            if(val>cur.val){
+                parent = cur;
+                cur = cur.right;
+            }else if(val<cur.val){
+                parent = cur;
+                cur = cur.left;
+            }else{
+                break;
+            }
         }
-        //查询右子树的高度
-        int rh = 0;
-        if(root.right!=null){
-            rh = getHeight(root.right);
+
+        //删除节点
+        //1、当前节点是叶子节点，直接删除该节点
+        if(cur.right == null && cur.left == null){
+            if(parent.left.val == val){
+                parent.left = null;
+            }else{
+                parent.right = null;
+            }
+        }else
+        //2、当前节点只有右节点或者左节点，子节点替换父节点
+        if(cur.right == null || cur.left == null){
+            if(parent.left.val == val){
+                parent.left = cur;
+            }else{
+                parent.right = cur;
+            }
+        }else{
+            //3、当前节点有左右节点,找左节点最大值替换或者找右节点替换
+            //左节点处理，找最大值
+            TreeNode max=cur.left;
+            TreeNode maxParent=cur;
+            while(max.right!=null){
+                maxParent = max;
+                max = max.right;
+
+            }
+            cur.val = max.val;
+            if (max==maxParent.left){
+                maxParent.left=max.right;
+            }else {
+                maxParent.right = max.right;
+            }
         }
-        if(lh-rh>1||lh-rh<-1){
-            Map<String,TreeNode> map = new HashMap<String, TreeNode>();
-            map.put("cur",root);
-            map.put("parent",parent);
-            treeStack.push(map);
-        }
-        searchImbalance(root.left,root,treeStack);
-        searchImbalance(root.right,root,treeStack);
+
+
+        //4、调整不平衡节点
+        return adjustment(root);
+
     }
 
 
