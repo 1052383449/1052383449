@@ -19,6 +19,23 @@ public class RBTree<K extends  Comparable<K>, V> {
     private static final boolean RED = true;    // 红色节点
     private static final boolean BLACK = false; // 黑色节点
 
+
+    public static void main(String[] args) {
+        RBTree rbTree = new RBTree();
+        rbTree.insert(80,80);
+        rbTree.insert(40,40);
+        rbTree.insert(120,120);
+        rbTree.insert(60,60);
+        rbTree.insert(50,50);
+        rbTree.insert(20,20);
+        rbTree.insert(10,10);
+        rbTree.insert(140,140);
+        rbTree.insert(100,100);
+        rbTree.insert(90,90);
+        rbTree.insert(30,30);
+        rbTree.inOrderPrint();
+    }
+
     /**
      * 根节点的引用
      */
